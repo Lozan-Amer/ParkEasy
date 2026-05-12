@@ -4,7 +4,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ParkingMap, Spot } from "@/components/ParkingMap";
+import { Badge } from "@/components/ui/badge";
+import { ParkingMap, Spot, PAYMENT_LABEL } from "@/components/ParkingMap";
+import { ReportSpotDialog } from "@/components/ReportSpotDialog";
+import { SpotDetailsDialog } from "@/components/SpotDetailsDialog";
 import { toast } from "sonner";
 import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy } from "lucide-react";
 
@@ -16,6 +19,8 @@ const Index = () => {
   const [position, setPosition] = useState<[number, number]>(TEL_AVIV);
   const [spots, setSpots] = useState<Spot[]>([]);
   const [reporting, setReporting] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [score, setScore] = useState(0);
   const [displayName, setDisplayName] = useState("");
 
@@ -23,7 +28,6 @@ const Index = () => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
-  // Geolocation
   useEffect(() => {
     if (!navigator.geolocation) return;
     const id = navigator.geolocation.watchPosition(
@@ -34,7 +38,6 @@ const Index = () => {
     return () => navigator.geolocation.clearWatch(id);
   }, []);
 
-  // Profile
   useEffect(() => {
     if (!user) return;
     supabase.from("profiles").select("score, display_name").eq("id", user.id).maybeSingle().then(({ data }) => {
@@ -45,15 +48,14 @@ const Index = () => {
     });
   }, [user]);
 
-  // Load + realtime spots
   const loadSpots = async () => {
     const { data } = await supabase
       .from("parking_spots")
-      .select("id, latitude, longitude, note, expires_at, created_at")
+      .select("id, latitude, longitude, note, expires_at, created_at, payment_type, duration_minutes")
       .gt("expires_at", new Date().toISOString())
       .eq("status", "available")
       .order("created_at", { ascending: false });
-    if (data) setSpots(data);
+    if (data) setSpots(data as Spot[]);
   };
 
   useEffect(() => {
@@ -70,18 +72,32 @@ const Index = () => {
     };
   }, [user]);
 
-  const handleReport = async () => {
+  const handleReport = async ({
+    duration,
+    note,
+    payment,
+  }: {
+    duration: number;
+    note: string;
+    payment: Spot["payment_type"];
+  }) => {
     if (!user) return;
     setReporting(true);
     try {
+      const expiresAt = new Date(Date.now() + duration * 60_000).toISOString();
       const { error } = await supabase.from("parking_spots").insert({
         user_id: user.id,
         latitude: position[0],
         longitude: position[1],
+        note: note || null,
+        payment_type: payment,
+        duration_minutes: duration,
+        expires_at: expiresAt,
       });
       if (error) throw error;
       toast.success("דיווחת על חניה! +10 נקודות 🎉");
       setScore((s) => s + 10);
+      setReportOpen(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "שגיאה");
     } finally {
@@ -119,7 +135,6 @@ const Index = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-background">
-      {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-card border-b shadow-[var(--shadow-soft)] z-[1000]">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
@@ -141,11 +156,9 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Map */}
       <div className="flex-1 relative">
-        <ParkingMap center={position} spots={spots} onSpotClick={navigateTo} />
+        <ParkingMap center={position} spots={spots} onSpotClick={setSelectedSpot} />
 
-        {/* Refresh */}
         <button
           onClick={loadSpots}
           className="absolute top-4 left-4 z-[500] w-11 h-11 rounded-full bg-card shadow-[var(--shadow-elevated)] flex items-center justify-center hover:scale-105 transition"
@@ -154,29 +167,25 @@ const Index = () => {
           <RefreshCw className="w-5 h-5 text-foreground" />
         </button>
 
-        {/* Stats pill */}
         <div className="absolute top-4 right-4 z-[500] px-4 py-2 rounded-full bg-card shadow-[var(--shadow-elevated)]">
           <span className="text-sm font-medium text-foreground">{spots.length} חניות זמינות</span>
         </div>
       </div>
 
-      {/* Bottom panel */}
       <div className="bg-card border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)] z-[1000]">
-        {/* Action button */}
         <div className="p-4">
           <Button
-            onClick={handleReport}
+            onClick={() => setReportOpen(true)}
             disabled={reporting}
             size="lg"
             className="w-full h-14 text-base font-bold shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-glow)] transition-all"
             style={{ background: "var(--gradient-primary)" }}
           >
-            {reporting ? <Loader2 className="w-5 h-5 animate-spin ml-2" /> : <Car className="w-5 h-5 ml-2" />}
+            <Car className="w-5 h-5 ml-2" />
             אני יוצא — דווח על חניה פנויה
           </Button>
         </div>
 
-        {/* Nearest spots list */}
         <div className="px-4 pb-4 max-h-48 overflow-y-auto">
           <h2 className="text-sm font-semibold text-muted-foreground mb-2">חניות קרובות</h2>
           {sortedSpots.length === 0 ? (
@@ -187,15 +196,34 @@ const Index = () => {
                 const dist = distanceKm(position, [s.latitude, s.longitude]);
                 const minsLeft = Math.max(0, Math.round((new Date(s.expires_at).getTime() - Date.now()) / 60000));
                 return (
-                  <Card key={s.id} className="p-3 flex items-center gap-3 hover:shadow-[var(--shadow-soft)] transition cursor-pointer" onClick={() => navigateTo(s)}>
+                  <Card
+                    key={s.id}
+                    className="p-3 flex items-center gap-3 hover:shadow-[var(--shadow-soft)] transition cursor-pointer"
+                    onClick={() => setSelectedSpot(s)}
+                  >
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <MapPin className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">{dist < 1 ? `${Math.round(dist * 1000)} מ׳` : `${dist.toFixed(1)} ק״מ`}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-sm">
+                          {dist < 1 ? `${Math.round(dist * 1000)} מ׳` : `${dist.toFixed(1)} ק״מ`}
+                        </span>
+                        <Badge variant="secondary" className="text-[10px] py-0 px-1.5">
+                          {PAYMENT_LABEL[s.payment_type]}
+                        </Badge>
+                      </div>
                       <div className="text-xs text-muted-foreground">פג תוקף בעוד {minsLeft} דק׳</div>
                     </div>
-                    <Button size="sm" variant="ghost" className="text-primary">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigateTo(s);
+                      }}
+                    >
                       <Navigation className="w-4 h-4 ml-1" />
                       נווט
                     </Button>
@@ -206,6 +234,15 @@ const Index = () => {
           )}
         </div>
       </div>
+
+      <ReportSpotDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        onSubmit={handleReport}
+        submitting={reporting}
+      />
+
+      <SpotDetailsDialog spot={selectedSpot} onClose={() => setSelectedSpot(null)} onNavigate={navigateTo} />
     </div>
   );
 };

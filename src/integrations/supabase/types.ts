@@ -14,34 +14,82 @@ export type Database = {
   }
   public: {
     Tables: {
+      parking_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parent_id: string | null
+          spot_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          spot_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          spot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parking_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "parking_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parking_comments_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "parking_spots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parking_spots: {
         Row: {
           created_at: string
+          duration_minutes: number
           expires_at: string
           id: string
           latitude: number
           longitude: number
           note: string | null
+          payment_type: Database["public"]["Enums"]["parking_payment_type"]
           status: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          duration_minutes?: number
           expires_at?: string
           id?: string
           latitude: number
           longitude: number
           note?: string | null
+          payment_type?: Database["public"]["Enums"]["parking_payment_type"]
           status?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          duration_minutes?: number
           expires_at?: string
           id?: string
           latitude?: number
           longitude?: number
           note?: string | null
+          payment_type?: Database["public"]["Enums"]["parking_payment_type"]
           status?: string
           user_id?: string
         }
@@ -82,7 +130,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      parking_payment_type: "free" | "metered" | "paid_lot" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -209,6 +257,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      parking_payment_type: ["free", "metered", "paid_lot", "private"],
+    },
   },
 } as const

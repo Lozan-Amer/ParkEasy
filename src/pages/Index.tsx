@@ -135,7 +135,7 @@ const Index = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-background">
-      <header className="flex items-center justify-between px-4 py-3 bg-card border-b shadow-[var(--shadow-soft)] z-[1000]">
+      <header className="flex items-center justify-between px-4 py-3 bg-card border-b shadow-[var(--shadow-soft)] z-30">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
             <MapPin className="w-5 h-5 text-white" />
@@ -172,7 +172,7 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="bg-card border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)] z-[1000]">
+      <div className="bg-card border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)] z-30">
         <div className="p-4">
           <Button
             onClick={() => setReportOpen(true)}

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Spot, PAYMENT_LABEL } from "./ParkingMap";
-import { Loader2, Send, Reply, Trash2, Navigation, Clock } from "lucide-react";
+import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 type Comment = {
@@ -35,6 +35,9 @@ export function SpotDetailsDialog({
   const [text, setText] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
+  const [reporter, setReporter] = useState<{ display_name: string | null; score: number } | null>(null);
+  const [alreadyFlagged, setAlreadyFlagged] = useState(false);
+  const [flagging, setFlagging] = useState(false);
 
   const load = async (spotId: string) => {
     setLoading(true);
@@ -61,6 +64,36 @@ export function SpotDetailsDialog({
   useEffect(() => {
     if (!spot) return;
     load(spot.id);
+    setAlreadyFlagged(false);
+    setReporter(null);
+
+    // Load reporter trust info
+    supabase
+      .from("parking_spots")
+      .select("user_id")
+      .eq("id", spot.id)
+      .maybeSingle()
+      .then(async ({ data }) => {
+        if (!data?.user_id) return;
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("display_name, score")
+          .eq("id", data.user_id)
+          .maybeSingle();
+        if (prof) setReporter(prof);
+      });
+
+    // Check if current user already flagged this spot
+    if (user) {
+      supabase
+        .from("spot_wrong_reports")
+        .select("id")
+        .eq("spot_id", spot.id)
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => setAlreadyFlagged(!!data));
+    }
+
     const channel = supabase
       .channel(`comments_${spot.id}`)
       .on(
@@ -72,7 +105,7 @@ export function SpotDetailsDialog({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [spot?.id]);
+  }, [spot?.id, user]);
 
   const post = async () => {
     if (!spot || !user || !text.trim()) return;
@@ -97,6 +130,24 @@ export function SpotDetailsDialog({
     if (error) toast.error(error.message);
   };
 
+  const flagWrong = async () => {
+    if (!spot || !user || alreadyFlagged) return;
+    if (!confirm("האם החניה הזו לא קיימת או לא פנויה? הדיווח יסיר אותה מהמפה.")) return;
+    setFlagging(true);
+    const { error } = await supabase.from("spot_wrong_reports").insert({
+      spot_id: spot.id,
+      user_id: user.id,
+    });
+    setFlagging(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setAlreadyFlagged(true);
+    toast.success("תודה על הדיווח! החניה הוסרה");
+    onClose();
+  };
+
   if (!spot) return null;
 
   const minsLeft = Math.max(0, Math.round((new Date(spot.expires_at).getTime() - Date.now()) / 60000));
@@ -116,18 +167,41 @@ export function SpotDetailsDialog({
             <Clock className="w-3 h-3" />
             עוד {minsLeft} דק׳
           </Badge>
+          {reporter && (
+            <Badge variant="outline" className="gap-1">
+              <Trophy className="w-3 h-3 text-warning" />
+              {reporter.display_name || "נהג"} · {reporter.score}
+            </Badge>
+          )}
         </div>
 
         {spot.note && (
           <div className="bg-muted/50 rounded-lg p-3 text-sm">{spot.note}</div>
         )}
 
-        <Button asChild variant="outline" className="w-full">
-          <a href={navigationHref} target={navigationWindowTarget} rel="noopener noreferrer" referrerPolicy="no-referrer">
-            <Navigation className="w-4 h-4 ml-2" />
-            נווט לחניה
-          </a>
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button asChild variant="outline">
+            <a href={navigationHref} target={navigationWindowTarget} rel="noopener noreferrer" referrerPolicy="no-referrer">
+              <Navigation className="w-4 h-4 ml-2" />
+              נווט
+            </a>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={flagWrong}
+            disabled={flagging || alreadyFlagged}
+            className="text-destructive hover:text-destructive"
+          >
+            {flagging ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <AlertTriangle className="w-4 h-4 ml-2" />
+                {alreadyFlagged ? "דווח" : "דיווח שגוי"}
+              </>
+            )}
+          </Button>
+        </div>
 
         <div className="border-t pt-3 flex-1 overflow-y-auto space-y-3 -mx-6 px-6">
           <h3 className="text-sm font-semibold text-muted-foreground">תגובות ({comments.length})</h3>

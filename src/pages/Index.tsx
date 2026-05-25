@@ -111,7 +111,17 @@ const Index = () => {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const target = isMobile ? wazeUrl : url;
     toast.success("פותח ניווט...");
-    window.location.assign(target);
+    // Break out of preview iframe so Google/Waze don't get blocked by X-Frame-Options
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = target;
+        return;
+      }
+    } catch {
+      // cross-origin top — fall through to new tab
+    }
+    const win = window.open(target, "_blank", "noopener,noreferrer");
+    if (!win) window.location.href = target;
   };
 
   const distanceKm = (a: [number, number], b: [number, number]) => {

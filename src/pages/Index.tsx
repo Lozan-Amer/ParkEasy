@@ -23,6 +23,7 @@ const Index = () => {
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [score, setScore] = useState(0);
   const [displayName, setDisplayName] = useState("");
+  const navigationWindowTarget = window.self !== window.top ? "_top" : "_blank";
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -220,7 +221,7 @@ const Index = () => {
                     <Button size="sm" variant="ghost" className="text-primary" asChild>
                       <a
                         href={getNavigationHref(s)}
-                        target="_blank"
+                        target={navigationWindowTarget}
                         rel="noopener noreferrer"
                         referrerPolicy="no-referrer"
                         onClick={(e) => e.stopPropagation()}
@@ -248,7 +249,7 @@ const Index = () => {
         spot={selectedSpot}
         onClose={() => setSelectedSpot(null)}
         navigationHref={selectedSpot ? getNavigationHref(selectedSpot) : "#"}
-        navigationWindowTarget="_blank"
+        navigationWindowTarget={navigationWindowTarget}
       />
     </div>
   );

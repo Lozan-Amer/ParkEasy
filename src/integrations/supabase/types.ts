@@ -66,8 +66,10 @@ export type Database = {
           longitude: number
           note: string | null
           payment_type: Database["public"]["Enums"]["parking_payment_type"]
+          removed_at: string | null
           status: string
           user_id: string
+          wrong_report_count: number
         }
         Insert: {
           created_at?: string
@@ -78,8 +80,10 @@ export type Database = {
           longitude: number
           note?: string | null
           payment_type?: Database["public"]["Enums"]["parking_payment_type"]
+          removed_at?: string | null
           status?: string
           user_id: string
+          wrong_report_count?: number
         }
         Update: {
           created_at?: string
@@ -90,8 +94,10 @@ export type Database = {
           longitude?: number
           note?: string | null
           payment_type?: Database["public"]["Enums"]["parking_payment_type"]
+          removed_at?: string | null
           status?: string
           user_id?: string
+          wrong_report_count?: number
         }
         Relationships: []
       }
@@ -121,6 +127,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      spot_wrong_reports: {
+        Row: {
+          created_at: string
+          id: string
+          spot_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          spot_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          spot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spot_wrong_reports_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "parking_spots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

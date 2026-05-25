@@ -128,7 +128,17 @@ const Index = () => {
     return 2 * R * Math.asin(Math.sqrt(x));
   };
 
-  const sortedSpots = [...spots].sort(
+  const filteredSpots = useMemo(() => {
+    return spots
+      .filter((s) => filters.payments.includes(s.payment_type))
+      .filter((s) => distanceKm(position, [s.latitude, s.longitude]) <= filters.maxDistanceKm)
+      .filter((s) => {
+        const minsLeft = Math.max(0, (new Date(s.expires_at).getTime() - Date.now()) / 60000);
+        return minsLeft >= filters.minMinutesLeft;
+      });
+  }, [spots, filters, position]);
+
+  const sortedSpots = [...filteredSpots].sort(
     (a, b) => distanceKm(position, [a.latitude, a.longitude]) - distanceKm(position, [b.latitude, b.longitude])
   );
 

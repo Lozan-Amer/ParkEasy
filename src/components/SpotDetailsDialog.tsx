@@ -181,7 +181,7 @@ export function SpotDetailsDialog({
         )}
 
         <div className="grid grid-cols-2 gap-2">
-          <NavigateButton lat={spot.latitude} lng={spot.longitude} variant="outline" />
+          <NavigateButton spotId={spot.id} lat={spot.latitude} lng={spot.longitude} variant="outline" />
 
           <Button
             variant="outline"

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Spot, PAYMENT_LABEL } from "./ParkingMap";
 import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy } from "lucide-react";
 import { toast } from "sonner";
+import { NavigateButton } from "./NavigateButton";
 
 type Comment = {
   id: string;
@@ -180,12 +181,8 @@ export function SpotDetailsDialog({
         )}
 
         <div className="grid grid-cols-2 gap-2">
-          <Button asChild variant="outline">
-            <a href={navigationHref} target={navigationWindowTarget} rel="noopener noreferrer" referrerPolicy="no-referrer">
-              <Navigation className="w-4 h-4 ml-2" />
-              נווט
-            </a>
-          </Button>
+          <NavigateButton lat={spot.latitude} lng={spot.longitude} variant="outline" />
+
           <Button
             variant="outline"
             onClick={flagWrong}

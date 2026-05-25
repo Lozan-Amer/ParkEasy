@@ -10,6 +10,7 @@ import { ReportSpotDialog } from "@/components/ReportSpotDialog";
 import { SpotDetailsDialog } from "@/components/SpotDetailsDialog";
 import { SpotFilters, DEFAULT_FILTERS, Filters } from "@/components/SpotFilters";
 import { LeaderboardDialog } from "@/components/LeaderboardDialog";
+import { NavigateButton } from "@/components/NavigateButton";
 import { toast } from "sonner";
 import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy } from "lucide-react";
 
@@ -239,18 +240,10 @@ const Index = () => {
                       </div>
                       <div className="text-xs text-muted-foreground">פג תוקף בעוד {minsLeft} דק׳</div>
                     </div>
-                    <Button size="sm" variant="ghost" className="text-primary" asChild>
-                      <a
-                        href={getNavigationHref(s)}
-                        target={navigationWindowTarget}
-                        rel="noopener noreferrer"
-                        referrerPolicy="no-referrer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Navigation className="w-4 h-4 ml-1" />
-                        נווט
-                      </a>
-                    </Button>
+                    <NavigateButton lat={s.latitude} lng={s.longitude} variant="ghost" size="sm" className="text-primary">
+                      <Navigation className="w-4 h-4 ml-1" />
+                      נווט
+                    </NavigateButton>
                   </Card>
                 );
               })}

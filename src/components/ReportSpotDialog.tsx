@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Loader2, Car } from "lucide-react";
 import { PaymentType, PAYMENT_LABEL } from "./ParkingMap";
 
-const DURATIONS = [10, 15, 30, 60, 120] as const;
+const DURATIONS = [1, 5, 10, 15, 30] as const;
 
 export function ReportSpotDialog({
   open,

@@ -21,11 +21,13 @@ type Comment = {
 export function SpotDetailsDialog({
   spot,
   onClose,
-  onNavigate,
+  navigationHref,
+  navigationWindowTarget,
 }: {
   spot: Spot | null;
   onClose: () => void;
-  onNavigate: (s: Spot) => void;
+  navigationHref: string;
+  navigationWindowTarget: "_blank" | "_top";
 }) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -120,9 +122,11 @@ export function SpotDetailsDialog({
           <div className="bg-muted/50 rounded-lg p-3 text-sm">{spot.note}</div>
         )}
 
-        <Button onClick={() => onNavigate(spot)} variant="outline" className="w-full">
-          <Navigation className="w-4 h-4 ml-2" />
-          נווט לחניה
+        <Button asChild variant="outline" className="w-full">
+          <a href={navigationHref} target={navigationWindowTarget} rel="noopener noreferrer" referrerPolicy="no-referrer">
+            <Navigation className="w-4 h-4 ml-2" />
+            נווט לחניה
+          </a>
         </Button>
 
         <div className="border-t pt-3 flex-1 overflow-y-auto space-y-3 -mx-6 px-6">

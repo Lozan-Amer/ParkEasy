@@ -23,6 +23,7 @@ const Index = () => {
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [score, setScore] = useState(0);
   const [displayName, setDisplayName] = useState("");
+  const navigationWindowTarget = window.self !== window.top ? "_top" : "_blank";
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -105,40 +106,11 @@ const Index = () => {
     }
   };
 
-  const navigateTo = (s: Spot) => {
+  const getNavigationHref = (s: Spot) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${s.latitude},${s.longitude}&travelmode=driving`;
     const wazeUrl = `https://waze.com/ul?ll=${s.latitude},${s.longitude}&navigate=yes`;
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const target = isMobile ? wazeUrl : url;
-    const isEmbeddedPreview = window.self !== window.top;
-
-    toast.success("פותח ניווט...");
-
-    try {
-      const popup = window.open("about:blank", "_blank");
-      if (popup) {
-        popup.opener = null;
-        popup.location.replace(target);
-        return;
-      }
-    } catch {
-      // fall through to link-based navigation fallback
-    }
-
-    const link = document.createElement("a");
-    link.href = target;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    if (!isEmbeddedPreview) {
-      window.location.assign(target);
-      return;
-    }
-
-    toast.error("אם לא נפתח ניווט, אשרי פתיחת חלונות קופצים ונסי שוב");
+    return isMobile ? wazeUrl : url;
   };
 
   const distanceKm = (a: [number, number], b: [number, number]) => {
@@ -246,17 +218,17 @@ const Index = () => {
                       </div>
                       <div className="text-xs text-muted-foreground">פג תוקף בעוד {minsLeft} דק׳</div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-primary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigateTo(s);
-                      }}
-                    >
-                      <Navigation className="w-4 h-4 ml-1" />
-                      נווט
+                    <Button size="sm" variant="ghost" className="text-primary" asChild>
+                      <a
+                        href={getNavigationHref(s)}
+                        target={navigationWindowTarget}
+                        rel="noopener noreferrer"
+                        referrerPolicy="no-referrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Navigation className="w-4 h-4 ml-1" />
+                        נווט
+                      </a>
                     </Button>
                   </Card>
                 );
@@ -273,7 +245,12 @@ const Index = () => {
         submitting={reporting}
       />
 
-      <SpotDetailsDialog spot={selectedSpot} onClose={() => setSelectedSpot(null)} onNavigate={navigateTo} />
+      <SpotDetailsDialog
+        spot={selectedSpot}
+        onClose={() => setSelectedSpot(null)}
+        navigationHref={selectedSpot ? getNavigationHref(selectedSpot) : "#"}
+        navigationWindowTarget={navigationWindowTarget}
+      />
     </div>
   );
 };

@@ -195,7 +195,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      mark_spot_taken: { Args: { _spot_id: string }; Returns: undefined }
+      cap_spot_expiry: { Args: { _spot_id: string }; Returns: undefined }
     }
     Enums: {
       parking_payment_type: "free" | "metered" | "paid_lot" | "private"

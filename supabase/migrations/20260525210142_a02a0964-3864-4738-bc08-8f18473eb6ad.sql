@@ -1,0 +1,16 @@
+CREATE OR REPLACE FUNCTION public.cap_spot_expiry(_spot_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.parking_spots
+    SET expires_at = LEAST(expires_at, now() + interval '1 hour')
+    WHERE id = _spot_id AND status = 'available';
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.cap_spot_expiry(uuid) TO authenticated;
+
+DROP FUNCTION IF EXISTS public.mark_spot_taken(uuid);

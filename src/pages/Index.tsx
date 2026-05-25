@@ -272,6 +272,12 @@ const Index = () => {
         navigationHref={selectedSpot ? getNavigationHref(selectedSpot) : "#"}
         navigationWindowTarget={navigationWindowTarget}
       />
+
+      <LeaderboardDialog
+        open={leaderboardOpen}
+        onOpenChange={setLeaderboardOpen}
+        currentUserId={user?.id}
+      />
     </div>
   );
 };

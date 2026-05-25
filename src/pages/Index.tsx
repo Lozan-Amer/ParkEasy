@@ -182,6 +182,18 @@ const Index = () => {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setMyCarOpen(true)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition ${
+              parkedCar
+                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                : "bg-muted text-muted-foreground border-border hover:bg-muted/70"
+            }`}
+            aria-label="הרכב שלי"
+          >
+            <ParkingCircle className="w-4 h-4" />
+            <span className="font-bold text-sm">{parkedCar ? "הרכב שלי" : "שמרתי פה"}</span>
+          </button>
+          <button
             onClick={() => setLeaderboardOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20 transition"
             aria-label="לוח מובילים"
@@ -287,6 +299,15 @@ const Index = () => {
         open={leaderboardOpen}
         onOpenChange={setLeaderboardOpen}
         currentUserId={user?.id}
+      />
+
+      <MyCarDialog
+        open={myCarOpen}
+        onOpenChange={setMyCarOpen}
+        userId={user.id}
+        position={position}
+        parkedCar={parkedCar}
+        onChanged={loadParkedCar}
       />
     </div>
   );

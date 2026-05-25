@@ -11,10 +11,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Navigation } from "lucide-react";
 import { useState, MouseEvent, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type Props = {
   lat: number;
   lng: number;
+  spotId?: string;
   children?: ReactNode;
   variant?: ButtonProps["variant"];
   size?: ButtonProps["size"];
@@ -29,10 +32,18 @@ function isIOS() {
   return /iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-export function NavigateButton({ lat, lng, children, variant = "outline", size, className }: Props) {
+export function NavigateButton({ lat, lng, spotId, children, variant = "outline", size, className }: Props) {
   const [open, setOpen] = useState(false);
 
-  const openIn = (target: "waze" | "google") => {
+  const markTaken = async () => {
+    if (!spotId) return;
+    const { error } = await supabase.rpc("mark_spot_taken", { _spot_id: spotId });
+    if (!error) {
+      toast.success("החניה סומנה כתפוסה — בהצלחה! 🚗");
+    }
+  };
+
+  const openIn = async (target: "waze" | "google") => {
     const mobile = isMobileDevice();
     const ios = isIOS();
 
@@ -51,6 +62,7 @@ export function NavigateButton({ lat, lng, children, variant = "outline", size, 
       }
     }
 
+    await markTaken();
     setOpen(false);
     if (mobile) {
       window.location.href = url;

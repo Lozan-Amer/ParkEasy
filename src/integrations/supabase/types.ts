@@ -162,7 +162,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      mark_spot_taken: { Args: { _spot_id: string }; Returns: undefined }
     }
     Enums: {
       parking_payment_type: "free" | "metered" | "paid_lot" | "private"

@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Loader2, Car } from "lucide-react";
 import { PaymentType, PAYMENT_LABEL } from "./ParkingMap";
 
-const DURATIONS = [1, 5, 10, 15, 30] as const;
+const DURATIONS = [1, 5, 10, 15, 30, 60] as const;
 
 export function ReportSpotDialog({
   open,
@@ -38,19 +38,19 @@ export function ReportSpotDialog({
         <div className="space-y-5 py-2">
           <div>
             <Label className="mb-2 block">תוך כמה זמן תתפנה?</Label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-6 gap-2">
               {DURATIONS.map((d) => (
                 <button
                   key={d}
                   type="button"
                   onClick={() => setDuration(d)}
-                  className={`py-2 rounded-lg text-sm font-medium border transition ${
+                  className={`py-2 rounded-lg text-xs font-medium border transition ${
                     duration === d
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-background border-input text-foreground hover:border-primary/40"
                   }`}
                 >
-                  {d < 60 ? `${d}׳` : `${d / 60} שע׳`}
+                  {d < 60 ? `${d}׳` : `שעה`}
                 </button>
               ))}
             </div>

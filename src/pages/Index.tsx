@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { ParkingMap, Spot, PAYMENT_LABEL } from "@/components/ParkingMap";
 import { ReportSpotDialog } from "@/components/ReportSpotDialog";
 import { SpotDetailsDialog } from "@/components/SpotDetailsDialog";
+import { SpotFilters, DEFAULT_FILTERS, Filters } from "@/components/SpotFilters";
+import { LeaderboardDialog } from "@/components/LeaderboardDialog";
 import { toast } from "sonner";
 import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy } from "lucide-react";
 
@@ -23,6 +25,8 @@ const Index = () => {
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [score, setScore] = useState(0);
   const [displayName, setDisplayName] = useState("");
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const navigationWindowTarget = "_blank" as const;
 
   useEffect(() => {

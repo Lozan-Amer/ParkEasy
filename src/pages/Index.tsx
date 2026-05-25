@@ -11,8 +11,9 @@ import { SpotDetailsDialog } from "@/components/SpotDetailsDialog";
 import { SpotFilters, DEFAULT_FILTERS, Filters } from "@/components/SpotFilters";
 import { LeaderboardDialog } from "@/components/LeaderboardDialog";
 import { NavigateButton } from "@/components/NavigateButton";
+import { MyCarDialog, ParkedCar } from "@/components/MyCarDialog";
 import { toast } from "sonner";
-import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy } from "lucide-react";
+import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy, ParkingCircle } from "lucide-react";
 
 const TEL_AVIV: [number, number] = [32.0853, 34.7818];
 
@@ -28,7 +29,23 @@ const Index = () => {
   const [displayName, setDisplayName] = useState("");
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [myCarOpen, setMyCarOpen] = useState(false);
+  const [parkedCar, setParkedCar] = useState<ParkedCar | null>(null);
   const navigationWindowTarget = "_blank" as const;
+
+  const loadParkedCar = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("parked_cars")
+      .select("id, latitude, longitude, note, photo_path, created_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setParkedCar((data as ParkedCar) ?? null);
+  };
+
+  useEffect(() => {
+    if (user) loadParkedCar();
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");

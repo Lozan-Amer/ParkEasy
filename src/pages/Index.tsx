@@ -110,14 +110,8 @@ const Index = () => {
     const wazeUrl = `https://waze.com/ul?ll=${s.latitude},${s.longitude}&navigate=yes`;
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const target = isMobile ? wazeUrl : url;
-    const a = document.createElement("a");
-    a.href = target;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
     toast.success("פותח ניווט...");
+    window.location.assign(target);
   };
 
   const distanceKm = (a: [number, number], b: [number, number]) => {

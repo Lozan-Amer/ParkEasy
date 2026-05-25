@@ -35,12 +35,9 @@ function isIOS() {
 export function NavigateButton({ lat, lng, spotId, children, variant = "outline", size, className }: Props) {
   const [open, setOpen] = useState(false);
 
-  const markTaken = async () => {
+  const capExpiry = async () => {
     if (!spotId) return;
-    const { error } = await supabase.rpc("mark_spot_taken", { _spot_id: spotId });
-    if (!error) {
-      toast.success("החניה סומנה כתפוסה — בהצלחה! 🚗");
-    }
+    await supabase.rpc("cap_spot_expiry", { _spot_id: spotId });
   };
 
   const openIn = async (target: "waze" | "google") => {
@@ -62,7 +59,7 @@ export function NavigateButton({ lat, lng, spotId, children, variant = "outline"
       }
     }
 
-    await markTaken();
+    await capExpiry();
     setOpen(false);
     if (mobile) {
       window.location.href = url;

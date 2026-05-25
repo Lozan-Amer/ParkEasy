@@ -7,6 +7,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Navigation } from "lucide-react";
 import { useState, MouseEvent, ReactNode } from "react";
@@ -50,62 +51,66 @@ export function NavigateButton({ lat, lng, children, variant = "outline", size, 
       }
     }
 
+    setOpen(false);
     if (mobile) {
-      // On mobile, direct href navigation is more reliable for opening native apps
       window.location.href = url;
     } else {
       window.open(url, "_blank", "noopener,noreferrer");
     }
-    setOpen(false);
   };
 
   return (
-    <>
-      <Button
-        type="button"
-        variant={variant}
-        size={size}
-        className={className}
-        onClick={(e: MouseEvent) => {
-          e.stopPropagation();
-          setOpen(true);
-        }}
-      >
-        {children ?? (
-          <>
-            <Navigation className="w-4 h-4 ml-2" />
-            נווט
-          </>
-        )}
-      </Button>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          type="button"
+          variant={variant}
+          size={size}
+          className={className}
+          onClick={(e: MouseEvent) => {
+            e.stopPropagation();
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {children ?? (
+            <>
+              <Navigation className="w-4 h-4 ml-2" />
+              נווט
+            </>
+          )}
+        </Button>
+      </AlertDialogTrigger>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent className="max-w-xs">
-          <AlertDialogHeader>
-            <AlertDialogTitle>איך לנווט?</AlertDialogTitle>
-            <AlertDialogDescription>בחר את אפליקציית הניווט המועדפת עליך</AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              onClick={() => openIn("waze")}
-              className="h-14 font-bold"
-              style={{ background: "hsl(195 100% 45%)", color: "white" }}
-            >
-              Waze
-            </Button>
-            <Button
-              onClick={() => openIn("google")}
-              variant="outline"
-              className="h-14 font-bold"
-            >
-              Google Maps
-            </Button>
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>ביטול</AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      <AlertDialogContent
+        className="max-w-xs"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <AlertDialogHeader>
+          <AlertDialogTitle>איך לנווט?</AlertDialogTitle>
+          <AlertDialogDescription>בחר את אפליקציית הניווט המועדפת עליך</AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            onClick={() => openIn("waze")}
+            className="h-14 font-bold"
+            style={{ background: "hsl(195 100% 45%)", color: "white" }}
+          >
+            Waze
+          </Button>
+          <Button
+            onClick={() => openIn("google")}
+            variant="outline"
+            className="h-14 font-bold"
+          >
+            Google Maps
+          </Button>
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel>ביטול</AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -23,7 +23,7 @@ const Index = () => {
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [score, setScore] = useState(0);
   const [displayName, setDisplayName] = useState("");
-  const navigationWindowTarget = window.self !== window.top ? "_top" : "_blank";
+  const navigationWindowTarget = "_blank" as const;
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");

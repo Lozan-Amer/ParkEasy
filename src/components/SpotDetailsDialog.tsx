@@ -180,12 +180,8 @@ export function SpotDetailsDialog({
         )}
 
         <div className="grid grid-cols-2 gap-2">
-          <Button asChild variant="outline">
-            <a href={navigationHref} target={navigationWindowTarget} rel="noopener noreferrer" referrerPolicy="no-referrer">
-              <Navigation className="w-4 h-4 ml-2" />
-              נווט
-            </a>
-          </Button>
+          <NavigateButton lat={spot.latitude} lng={spot.longitude} variant="outline" />
+
           <Button
             variant="outline"
             onClick={flagWrong}

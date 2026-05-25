@@ -10,6 +10,7 @@ import { ReportSpotDialog } from "@/components/ReportSpotDialog";
 import { SpotDetailsDialog } from "@/components/SpotDetailsDialog";
 import { SpotFilters, DEFAULT_FILTERS, Filters } from "@/components/SpotFilters";
 import { LeaderboardDialog } from "@/components/LeaderboardDialog";
+import { NavigateButton } from "@/components/NavigateButton";
 import { toast } from "sonner";
 import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy } from "lucide-react";
 

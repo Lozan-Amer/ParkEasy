@@ -11,8 +11,9 @@ import { SpotDetailsDialog } from "@/components/SpotDetailsDialog";
 import { SpotFilters, DEFAULT_FILTERS, Filters } from "@/components/SpotFilters";
 import { LeaderboardDialog } from "@/components/LeaderboardDialog";
 import { NavigateButton } from "@/components/NavigateButton";
+import { MyCarDialog, ParkedCar } from "@/components/MyCarDialog";
 import { toast } from "sonner";
-import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy } from "lucide-react";
+import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy, ParkingCircle } from "lucide-react";
 
 const TEL_AVIV: [number, number] = [32.0853, 34.7818];
 
@@ -28,7 +29,23 @@ const Index = () => {
   const [displayName, setDisplayName] = useState("");
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [myCarOpen, setMyCarOpen] = useState(false);
+  const [parkedCar, setParkedCar] = useState<ParkedCar | null>(null);
   const navigationWindowTarget = "_blank" as const;
+
+  const loadParkedCar = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("parked_cars")
+      .select("id, latitude, longitude, note, photo_path, created_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setParkedCar((data as ParkedCar) ?? null);
+  };
+
+  useEffect(() => {
+    if (user) loadParkedCar();
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -165,6 +182,18 @@ const Index = () => {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setMyCarOpen(true)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition ${
+              parkedCar
+                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                : "bg-muted text-muted-foreground border-border hover:bg-muted/70"
+            }`}
+            aria-label="הרכב שלי"
+          >
+            <ParkingCircle className="w-4 h-4" />
+            <span className="font-bold text-sm">{parkedCar ? "הרכב שלי" : "שמרתי פה"}</span>
+          </button>
+          <button
             onClick={() => setLeaderboardOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20 transition"
             aria-label="לוח מובילים"
@@ -270,6 +299,15 @@ const Index = () => {
         open={leaderboardOpen}
         onOpenChange={setLeaderboardOpen}
         currentUserId={user?.id}
+      />
+
+      <MyCarDialog
+        open={myCarOpen}
+        onOpenChange={setMyCarOpen}
+        userId={user.id}
+        position={position}
+        parkedCar={parkedCar}
+        onChanged={loadParkedCar}
       />
     </div>
   );

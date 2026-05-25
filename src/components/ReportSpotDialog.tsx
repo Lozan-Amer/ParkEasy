@@ -20,7 +20,7 @@ export function ReportSpotDialog({
   onSubmit: (data: { duration: number; note: string; payment: PaymentType }) => void;
   submitting: boolean;
 }) {
-  const [duration, setDuration] = useState<number>(15);
+  const [duration, setDuration] = useState<number>(5);
   const [note, setNote] = useState("");
   const [payment, setPayment] = useState<PaymentType>("free");
 

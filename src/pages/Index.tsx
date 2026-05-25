@@ -110,18 +110,35 @@ const Index = () => {
     const wazeUrl = `https://waze.com/ul?ll=${s.latitude},${s.longitude}&navigate=yes`;
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const target = isMobile ? wazeUrl : url;
+    const isEmbeddedPreview = window.self !== window.top;
+
     toast.success("פותח ניווט...");
-    // Break out of preview iframe so Google/Waze don't get blocked by X-Frame-Options
+
     try {
-      if (window.top && window.top !== window.self) {
-        window.top.location.href = target;
+      const popup = window.open("about:blank", "_blank");
+      if (popup) {
+        popup.opener = null;
+        popup.location.replace(target);
         return;
       }
     } catch {
-      // cross-origin top — fall through to new tab
+      // fall through to link-based navigation fallback
     }
-    const win = window.open(target, "_blank", "noopener,noreferrer");
-    if (!win) window.location.href = target;
+
+    const link = document.createElement("a");
+    link.href = target;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    if (!isEmbeddedPreview) {
+      window.location.assign(target);
+      return;
+    }
+
+    toast.error("אם לא נפתח ניווט, אשרי פתיחת חלונות קופצים ונסי שוב");
   };
 
   const distanceKm = (a: [number, number], b: [number, number]) => {

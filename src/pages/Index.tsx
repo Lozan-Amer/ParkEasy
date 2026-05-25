@@ -163,10 +163,14 @@ const Index = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning/10 text-warning border border-warning/20">
+          <button
+            onClick={() => setLeaderboardOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20 transition"
+            aria-label="לוח מובילים"
+          >
             <Trophy className="w-4 h-4" />
             <span className="font-bold text-sm">{score}</span>
-          </div>
+          </button>
           <Button variant="ghost" size="icon" onClick={signOut} aria-label="התנתק">
             <LogOut className="w-4 h-4" />
           </Button>
@@ -174,18 +178,21 @@ const Index = () => {
       </header>
 
       <div className="flex-1 relative isolate z-0">
-        <ParkingMap center={position} spots={spots} onSpotClick={setSelectedSpot} />
+        <ParkingMap center={position} spots={filteredSpots} onSpotClick={setSelectedSpot} />
 
-        <button
-          onClick={loadSpots}
-          className="absolute top-4 left-4 z-[500] w-11 h-11 rounded-full bg-card shadow-[var(--shadow-elevated)] flex items-center justify-center hover:scale-105 transition"
-          aria-label="רענן"
-        >
-          <RefreshCw className="w-5 h-5 text-foreground" />
-        </button>
+        <div className="absolute top-4 left-4 z-[500] flex flex-col gap-2">
+          <button
+            onClick={loadSpots}
+            className="w-11 h-11 rounded-full bg-card shadow-[var(--shadow-elevated)] flex items-center justify-center hover:scale-105 transition"
+            aria-label="רענן"
+          >
+            <RefreshCw className="w-5 h-5 text-foreground" />
+          </button>
+          <SpotFilters filters={filters} onChange={setFilters} activeCount={filteredSpots.length} />
+        </div>
 
         <div className="absolute top-4 right-4 z-[500] px-4 py-2 rounded-full bg-card shadow-[var(--shadow-elevated)]">
-          <span className="text-sm font-medium text-foreground">{spots.length} חניות זמינות</span>
+          <span className="text-sm font-medium text-foreground">{filteredSpots.length} מתוך {spots.length}</span>
         </div>
       </div>
 

@@ -20,15 +20,42 @@ type Props = {
   className?: string;
 };
 
+function isMobileDevice() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+function isIOS() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 export function NavigateButton({ lat, lng, children, variant = "outline", size, className }: Props) {
   const [open, setOpen] = useState(false);
 
   const openIn = (target: "waze" | "google") => {
-    const url =
-      target === "waze"
-        ? `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`
-        : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    const mobile = isMobileDevice();
+    const ios = isIOS();
+
+    let url: string;
+    if (target === "waze") {
+      url = mobile
+        ? `waze://?ll=${lat},${lng}&navigate=yes`
+        : `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+    } else {
+      if (mobile) {
+        url = ios
+          ? `comgooglemaps://?daddr=${lat},${lng}&directionsmode=driving`
+          : `google.navigation:q=${lat},${lng}`;
+      } else {
+        url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+      }
+    }
+
+    if (mobile) {
+      // On mobile, direct href navigation is more reliable for opening native apps
+      window.location.href = url;
+    } else {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
     setOpen(false);
   };
 

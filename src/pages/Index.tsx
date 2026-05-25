@@ -156,7 +156,7 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative isolate z-0">
         <ParkingMap center={position} spots={spots} onSpotClick={setSelectedSpot} />
 
         <button

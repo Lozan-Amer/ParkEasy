@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Spot, PAYMENT_LABEL } from "./ParkingMap";
 import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy } from "lucide-react";
 import { toast } from "sonner";
+import { NavigateButton } from "./NavigateButton";
 
 type Comment = {
   id: string;

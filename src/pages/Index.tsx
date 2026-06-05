@@ -107,7 +107,7 @@ const Index = () => {
     if (!user) return;
     setReporting(true);
     try {
-      const expiresAt = new Date(Date.now() + duration * 60_000).toISOString();
+      const expiresAt = new Date(Date.now() + 2 * 60 * 60_000).toISOString();
       const { error } = await supabase.from("parking_spots").insert({
         user_id: user.id,
         latitude: position[0],

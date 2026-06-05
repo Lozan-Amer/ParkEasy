@@ -179,10 +179,6 @@ export function SpotDetailsDialog({
 
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="secondary">{PAYMENT_LABEL[spot.payment_type]}</Badge>
-          <Badge variant="outline" className="gap-1">
-            <Clock className="w-3 h-3" />
-            עוד {minsLeft} דק׳
-          </Badge>
           {reporter && (
             <Badge variant="outline" className="gap-1">
               <Trophy className="w-3 h-3 text-warning" />

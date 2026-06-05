@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Spot, PAYMENT_LABEL } from "./ParkingMap";
-import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy } from "lucide-react";
+import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { NavigateButton } from "./NavigateButton";
 

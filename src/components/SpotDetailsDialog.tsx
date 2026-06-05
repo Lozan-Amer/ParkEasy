@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Spot, PAYMENT_LABEL } from "./ParkingMap";
-import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy } from "lucide-react";
+import { Loader2, Send, Reply, Trash2, Navigation, Clock, AlertTriangle, Trophy, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { NavigateButton } from "./NavigateButton";
 
@@ -39,6 +39,7 @@ export function SpotDetailsDialog({
   const [reporter, setReporter] = useState<{ display_name: string | null; score: number } | null>(null);
   const [alreadyFlagged, setAlreadyFlagged] = useState(false);
   const [flagging, setFlagging] = useState(false);
+  const [markingTaken, setMarkingTaken] = useState(false);
 
   const load = async (spotId: string) => {
     setLoading(true);
@@ -149,6 +150,20 @@ export function SpotDetailsDialog({
     onClose();
   };
 
+  const markTaken = async () => {
+    if (!spot || !user) return;
+    if (!confirm("לסמן שהחניה נתפסה ולהסיר אותה מהרשימה?")) return;
+    setMarkingTaken(true);
+    const { error } = await supabase.rpc("mark_spot_taken", { _spot_id: spot.id });
+    setMarkingTaken(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("תודה! החניה סומנה כתפוסה");
+    onClose();
+  };
+
   if (!spot) return null;
 
   const minsLeft = Math.max(0, Math.round((new Date(spot.expires_at).getTime() - Date.now()) / 60000));
@@ -180,8 +195,24 @@ export function SpotDetailsDialog({
           <div className="bg-muted/50 rounded-lg p-3 text-sm">{spot.note}</div>
         )}
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <NavigateButton spotId={spot.id} lat={spot.latitude} lng={spot.longitude} variant="outline" />
+
+          <Button
+            variant="outline"
+            onClick={markTaken}
+            disabled={markingTaken}
+            className="text-[hsl(var(--ocean-teal))] hover:text-[hsl(var(--ocean-teal))]"
+          >
+            {markingTaken ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Ban className="w-4 h-4 ml-2" />
+                נתפסה
+              </>
+            )}
+          </Button>
 
           <Button
             variant="outline"

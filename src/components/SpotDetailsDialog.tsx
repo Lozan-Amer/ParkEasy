@@ -150,6 +150,20 @@ export function SpotDetailsDialog({
     onClose();
   };
 
+  const markTaken = async () => {
+    if (!spot || !user) return;
+    if (!confirm("לסמן שהחניה נתפסה ולהסיר אותה מהרשימה?")) return;
+    setMarkingTaken(true);
+    const { error } = await supabase.rpc("mark_spot_taken", { _spot_id: spot.id });
+    setMarkingTaken(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("תודה! החניה סומנה כתפוסה");
+    onClose();
+  };
+
   if (!spot) return null;
 
   const minsLeft = Math.max(0, Math.round((new Date(spot.expires_at).getTime() - Date.now()) / 60000));

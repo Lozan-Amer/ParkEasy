@@ -13,7 +13,17 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Manrope", "Heebo", "system-ui", "sans-serif"],
+        display: ["Sora", "Manrope", "Heebo", "sans-serif"],
+      },
       colors: {
+        ocean: {
+          deep: "hsl(var(--ocean-deep))",
+          mid: "hsl(var(--ocean-mid))",
+          teal: "hsl(var(--ocean-teal))",
+          mint: "hsl(var(--ocean-mint))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

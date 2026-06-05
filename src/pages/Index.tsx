@@ -170,40 +170,45 @@ const Index = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-background">
-      <header className="flex items-center justify-between px-4 py-3 bg-card border-b shadow-[var(--shadow-soft)] z-30">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
-            <MapPin className="w-5 h-5 text-white" />
+      <header className="px-4 pt-4 pb-3 z-30 text-white" style={{ background: "var(--gradient-header)" }}>
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-[var(--shadow-glow)]" style={{ background: "var(--gradient-primary)" }}>
+              <MapPin className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="font-display font-bold text-white text-lg leading-tight tracking-tight">ParkEasy</h1>
+              <p className="text-[hsl(var(--ocean-mint))] text-[11px] leading-tight">שלום, {displayName || "נהג"}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-bold text-foreground leading-tight">ParkEasy</h1>
-            <p className="text-xs text-muted-foreground leading-tight">שלום, {displayName || "נהג"}</p>
-          </div>
+          <button onClick={signOut} aria-label="התנתק" className="text-white/60 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors">
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={() => setLeaderboardOpen(true)}
+            className="bg-[hsl(var(--ocean-deep))]/60 hover:bg-[hsl(var(--ocean-deep))]/80 p-3 rounded-2xl border border-[hsl(var(--ocean-teal))]/30 transition text-right"
+            aria-label="לוח מובילים"
+          >
+            <p className="text-[hsl(var(--ocean-mint))] text-[10px] font-bold uppercase tracking-widest mb-0.5 flex items-center gap-1.5">
+              <Trophy className="w-3 h-3" /> ניקוד קהילה
+            </p>
+            <span className="font-display text-white font-bold text-lg">{score.toLocaleString()}</span>
+          </button>
           <button
             onClick={() => setMyCarOpen(true)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition ${
+            className={`p-3 rounded-2xl flex flex-col justify-center items-center transition active:scale-95 ${
               parkedCar
-                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                : "bg-muted text-muted-foreground border-border hover:bg-muted/70"
+                ? "bg-[hsl(var(--ocean-mint))] text-[hsl(var(--ocean-deep))]"
+                : "bg-[hsl(var(--ocean-teal))] text-white"
             }`}
             aria-label="הרכב שלי"
           >
-            <ParkingCircle className="w-4 h-4" />
-            <span className="font-bold text-sm">{parkedCar ? "הרכב שלי" : "שמרתי פה"}</span>
+            <ParkingCircle className="w-5 h-5 mb-1" />
+            <span className="text-xs font-bold">{parkedCar ? "הרכב שלי" : "שמור מיקום חניה"}</span>
           </button>
-          <button
-            onClick={() => setLeaderboardOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20 transition"
-            aria-label="לוח מובילים"
-          >
-            <Trophy className="w-4 h-4" />
-            <span className="font-bold text-sm">{score}</span>
-          </button>
-          <Button variant="ghost" size="icon" onClick={signOut} aria-label="התנתק">
-            <LogOut className="w-4 h-4" />
-          </Button>
         </div>
       </header>
 
@@ -221,22 +226,24 @@ const Index = () => {
           <SpotFilters filters={filters} onChange={setFilters} activeCount={filteredSpots.length} />
         </div>
 
-        <div className="absolute top-4 right-4 z-[500] px-4 py-2 rounded-full bg-card shadow-[var(--shadow-elevated)]">
-          <span className="text-sm font-medium text-foreground">{filteredSpots.length} מתוך {spots.length}</span>
+        <div className="absolute top-4 right-4 z-[500] px-4 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[var(--shadow-elevated)] border border-white/50 flex items-center gap-2">
+          <span className="w-2 h-2 bg-[hsl(var(--success))] rounded-full animate-pulse" />
+          <span className="text-sm font-bold text-[hsl(var(--ocean-deep))]">{filteredSpots.length} חניות פנויות</span>
         </div>
       </div>
 
-      <div className="bg-card border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)] z-30">
-        <div className="p-4">
+      <div className="bg-card border-t shadow-[0_-10px_40px_-10px_rgba(12,35,64,0.25)] rounded-t-[2rem] z-30 -mt-4 relative">
+        <div className="p-4 pt-5">
           <Button
             onClick={() => setReportOpen(true)}
             disabled={reporting}
             size="lg"
-            className="w-full h-14 text-base font-bold shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-glow)] transition-all"
-            style={{ background: "var(--gradient-primary)" }}
+            className="w-full h-14 text-base font-bold rounded-2xl shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-glow)] transition-all bg-[hsl(var(--ocean-deep))] hover:bg-[hsl(var(--ocean-mid))] text-white"
           >
-            <Car className="w-5 h-5 ml-2" />
-            אני יוצא — דווח על חניה פנויה
+            <span className="w-8 h-8 rounded-lg bg-[hsl(var(--ocean-mint))] flex items-center justify-center ml-2">
+              <Car className="w-5 h-5 text-[hsl(var(--ocean-deep))]" />
+            </span>
+            דווח על חניה פנויה
           </Button>
         </div>
 

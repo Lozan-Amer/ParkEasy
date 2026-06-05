@@ -195,8 +195,24 @@ export function SpotDetailsDialog({
           <div className="bg-muted/50 rounded-lg p-3 text-sm">{spot.note}</div>
         )}
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <NavigateButton spotId={spot.id} lat={spot.latitude} lng={spot.longitude} variant="outline" />
+
+          <Button
+            variant="outline"
+            onClick={markTaken}
+            disabled={markingTaken}
+            className="text-[hsl(var(--ocean-teal))] hover:text-[hsl(var(--ocean-teal))]"
+          >
+            {markingTaken ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Ban className="w-4 h-4 ml-2" />
+                נתפסה
+              </>
+            )}
+          </Button>
 
           <Button
             variant="outline"

@@ -107,7 +107,7 @@ const Index = () => {
     if (!user) return;
     setReporting(true);
     try {
-      const expiresAt = new Date(Date.now() + duration * 60_000).toISOString();
+      const expiresAt = new Date(Date.now() + 2 * 60 * 60_000).toISOString();
       const { error } = await supabase.from("parking_spots").insert({
         user_id: user.id,
         latitude: position[0],
@@ -274,7 +274,7 @@ const Index = () => {
                           {PAYMENT_LABEL[s.payment_type]}
                         </Badge>
                       </div>
-                      <div className="text-xs text-muted-foreground">פג תוקף בעוד {minsLeft} דק׳</div>
+                      
                     </div>
                     <NavigateButton spotId={s.id} lat={s.latitude} lng={s.longitude} variant="ghost" size="sm" className="text-primary">
                       <Navigation className="w-4 h-4 ml-1" />

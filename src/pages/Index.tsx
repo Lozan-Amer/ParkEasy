@@ -226,22 +226,24 @@ const Index = () => {
           <SpotFilters filters={filters} onChange={setFilters} activeCount={filteredSpots.length} />
         </div>
 
-        <div className="absolute top-4 right-4 z-[500] px-4 py-2 rounded-full bg-card shadow-[var(--shadow-elevated)]">
-          <span className="text-sm font-medium text-foreground">{filteredSpots.length} מתוך {spots.length}</span>
+        <div className="absolute top-4 right-4 z-[500] px-4 py-2 rounded-full bg-white/95 backdrop-blur-md shadow-[var(--shadow-elevated)] border border-white/50 flex items-center gap-2">
+          <span className="w-2 h-2 bg-[hsl(var(--success))] rounded-full animate-pulse" />
+          <span className="text-sm font-bold text-[hsl(var(--ocean-deep))]">{filteredSpots.length} חניות פנויות</span>
         </div>
       </div>
 
-      <div className="bg-card border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)] z-30">
-        <div className="p-4">
+      <div className="bg-card border-t shadow-[0_-10px_40px_-10px_rgba(12,35,64,0.25)] rounded-t-[2rem] z-30 -mt-4 relative">
+        <div className="p-4 pt-5">
           <Button
             onClick={() => setReportOpen(true)}
             disabled={reporting}
             size="lg"
-            className="w-full h-14 text-base font-bold shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-glow)] transition-all"
-            style={{ background: "var(--gradient-primary)" }}
+            className="w-full h-14 text-base font-bold rounded-2xl shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-glow)] transition-all bg-[hsl(var(--ocean-deep))] hover:bg-[hsl(var(--ocean-mid))] text-white"
           >
-            <Car className="w-5 h-5 ml-2" />
-            אני יוצא — דווח על חניה פנויה
+            <span className="w-8 h-8 rounded-lg bg-[hsl(var(--ocean-mint))] flex items-center justify-center ml-2">
+              <Car className="w-5 h-5 text-[hsl(var(--ocean-deep))]" />
+            </span>
+            דווח על חניה פנויה
           </Button>
         </div>
 

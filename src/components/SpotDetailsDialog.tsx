@@ -39,6 +39,7 @@ export function SpotDetailsDialog({
   const [reporter, setReporter] = useState<{ display_name: string | null; score: number } | null>(null);
   const [alreadyFlagged, setAlreadyFlagged] = useState(false);
   const [flagging, setFlagging] = useState(false);
+  const [markingTaken, setMarkingTaken] = useState(false);
 
   const load = async (spotId: string) => {
     setLoading(true);

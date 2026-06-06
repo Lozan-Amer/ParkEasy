@@ -13,7 +13,7 @@ import { LeaderboardDialog } from "@/components/LeaderboardDialog";
 import { NavigateButton } from "@/components/NavigateButton";
 import { MyCarDialog, ParkedCar } from "@/components/MyCarDialog";
 import { toast } from "sonner";
-import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy, ParkingCircle } from "lucide-react";
+import { LogOut, MapPin, Navigation, Car, RefreshCw, Loader2, Trophy, ParkingCircle, Share2 } from "lucide-react";
 
 const TEL_AVIV: [number, number] = [32.0853, 34.7818];
 

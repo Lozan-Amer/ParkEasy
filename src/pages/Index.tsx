@@ -181,9 +181,30 @@ const Index = () => {
               <p className="text-[hsl(var(--ocean-mint))] text-[11px] leading-tight">שלום, {displayName || "נהג"}</p>
             </div>
           </div>
-          <button onClick={signOut} aria-label="התנתק" className="text-white/60 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors">
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={async () => {
+                const url = `https://www.google.com/maps?q=${position[0]},${position[1]}`;
+                const text = `📍 המיקום שלי כרגע: ${url}`;
+                if (navigator.share) {
+                  try {
+                    await navigator.share({ title: "המיקום שלי", text, url });
+                    return;
+                  } catch {
+                    // user cancelled, fall through to whatsapp
+                  }
+                }
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+              }}
+              aria-label="שתף מיקום"
+              className="text-white/60 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+            <button onClick={signOut} aria-label="התנתק" className="text-white/60 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">

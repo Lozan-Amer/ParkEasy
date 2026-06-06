@@ -135,34 +135,34 @@ export function SpotDetailsDialog({
   const flagWrong = async () => {
     if (!spot || !user || alreadyFlagged) return;
     if (!confirm("האם החניה הזו לא קיימת או לא פנויה? הדיווח יסיר אותה מהמפה.")) return;
-    setFlagging(true);
-    const { error } = await supabase.from("spot_wrong_reports").insert({
-      spot_id: spot.id,
-      user_id: user.id,
-    });
-    setFlagging(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    const spotId = spot.id;
+    const userId = user.id;
+    // Optimistic: close + toast immediately
     setAlreadyFlagged(true);
     toast.success("תודה על הדיווח! החניה הוסרה");
     onClose();
+    // Persist in background
+    supabase
+      .from("spot_wrong_reports")
+      .insert({ spot_id: spotId, user_id: userId })
+      .then(({ error }) => {
+        if (error) toast.error(error.message);
+      });
   };
 
   const markTaken = async () => {
     if (!spot || !user) return;
     if (!confirm("לסמן שהחניה נתפסה ולהסיר אותה מהרשימה?")) return;
-    setMarkingTaken(true);
-    const { error } = await supabase.rpc("mark_spot_taken", { _spot_id: spot.id });
-    setMarkingTaken(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    const spotId = spot.id;
+    // Optimistic: close + toast immediately
     toast.success("תודה! החניה סומנה כתפוסה");
     onClose();
+    // Persist in background
+    supabase.rpc("mark_spot_taken", { _spot_id: spotId }).then(({ error }) => {
+      if (error) toast.error(error.message);
+    });
   };
+
 
   if (!spot) return null;
 

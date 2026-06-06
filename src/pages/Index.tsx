@@ -105,27 +105,50 @@ const Index = () => {
     payment: Spot["payment_type"];
   }) => {
     if (!user) return;
-    setReporting(true);
-    try {
-      const expiresAt = new Date(Date.now() + 2 * 60 * 60_000).toISOString();
-      const { error } = await supabase.from("parking_spots").insert({
-        user_id: user.id,
-        latitude: position[0],
-        longitude: position[1],
-        note: note || null,
-        payment_type: payment,
-        duration_minutes: duration,
-        expires_at: expiresAt,
-      });
-      if (error) throw error;
-      toast.success("דיווחת על חניה! +10 נקודות 🎉");
-      setScore((s) => s + 10);
-      setReportOpen(false);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "שגיאה");
-    } finally {
-      setReporting(false);
-    }
+    // Optimistic: close dialog + show spot immediately
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 2 * 60 * 60_000);
+    const tempId = `tmp-${crypto.randomUUID()}`;
+    const optimistic: Spot = {
+      id: tempId,
+      latitude: position[0],
+      longitude: position[1],
+      note: note || null,
+      payment_type: payment,
+      duration_minutes: duration,
+      expires_at: expiresAt.toISOString(),
+      created_at: now.toISOString(),
+    };
+    setSpots((prev) => [optimistic, ...prev]);
+    setScore((s) => s + 10);
+    setReportOpen(false);
+    toast.success("דיווחת על חניה! +10 נקודות 🎉");
+
+    // Persist in background
+    (async () => {
+      const { data, error } = await supabase
+        .from("parking_spots")
+        .insert({
+          user_id: user.id,
+          latitude: position[0],
+          longitude: position[1],
+          note: note || null,
+          payment_type: payment,
+          duration_minutes: duration,
+          expires_at: expiresAt.toISOString(),
+        })
+        .select("id, latitude, longitude, note, expires_at, created_at, payment_type, duration_minutes")
+        .single();
+      if (error) {
+        setSpots((prev) => prev.filter((s) => s.id !== tempId));
+        setScore((s) => Math.max(0, s - 10));
+        toast.error(error.message || "שגיאה בדיווח");
+        return;
+      }
+      if (data) {
+        setSpots((prev) => [data as Spot, ...prev.filter((s) => s.id !== tempId)]);
+      }
+    })();
   };
 
   const getNavigationHref = (s: Spot) => {

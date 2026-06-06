@@ -73,13 +73,13 @@ const TILE_CONFIG: Record<MapStyle, { url: string; attribution: string; maxZoom:
   street: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "&copy; OpenStreetMap",
-    maxZoom: 21,
+    maxZoom: 24,
     maxNativeZoom: 19,
   },
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri",
-    maxZoom: 21,
+    maxZoom: 24,
     maxNativeZoom: 19,
   },
 };

@@ -73,14 +73,14 @@ const TILE_CONFIG: Record<MapStyle, { url: string; attribution: string; maxZoom:
   street: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "&copy; OpenStreetMap",
-    maxZoom: 24,
+    maxZoom: 22,
     maxNativeZoom: 19,
   },
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri",
-    maxZoom: 24,
-    maxNativeZoom: 19,
+    maxZoom: 22,
+    maxNativeZoom: 21,
   },
 };
 
@@ -99,7 +99,7 @@ export const ParkingMap = ({
 
   return (
     <div className="relative w-full h-full">
-      <MapContainer center={center} zoom={15} maxZoom={24} className="w-full h-full" zoomControl={false}>
+      <MapContainer center={center} zoom={15} maxZoom={22} className="w-full h-full" zoomControl={false}>
         <TileLayer key={mapStyle} url={tile.url} attribution={tile.attribution} maxZoom={tile.maxZoom} maxNativeZoom={tile.maxNativeZoom} />
         <Recenter center={center} />
         <CircleMarker
